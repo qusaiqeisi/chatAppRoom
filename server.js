@@ -28,6 +28,7 @@ app.get('/:room', (req, res) => {
   if (rooms[req.params.room] == null) {
     return res.redirect('/')
   }
+  console.log('jhhhhhhhhhh',req.params.room);
   res.render('room', { roomName: req.params.room })
 })
 
@@ -37,16 +38,17 @@ io.on('connection', socket => {
   socket.on('new-user', (room, name) => {
     socket.join(room)
     rooms[room].users[socket.id] = name
-    console.log('name',name);
-    socket.to(room).broadcast.emit('user-connected', name)
+    console.log('room',room);
+
+    socket.to(room).emit('user-connected', name)
 
   })
   socket.on('send-chat-message', (room, message) => {
-    socket.to(room).broadcast.emit('chat-message', { message: message, name: rooms[room].users[socket.id] })
+    socket.to(room).emit('chat-message', { message: message, name: rooms[room].users[socket.id] })
   })
   socket.on('disconnect', () => {
     getUserRooms(socket).forEach(room => {
-      socket.to(room).broadcast.emit('user-disconnected', rooms[room].users[socket.id])
+      socket.to(room).emit('user-disconnected', rooms[room].users[socket.id])
       delete rooms[room].users[socket.id]
     })
   })
