@@ -29,6 +29,7 @@ socket.on('room-created', room => {
 })
 
 socket.on('chat-message', data => {
+  
   appendMessage(`${data.name}: ${data.message}`)
 })
 
